@@ -1,5 +1,7 @@
 # GBAMultiCartMenuV2
 
+Note: This fork is intended to modify the program's functionality. It's in progress, currently it shouldn't be considered stable. Data loss on your cartridge could occur.
+
 Well, somebody want me to add readme, so here it is.
 
 What cart can you use?
