@@ -10,7 +10,7 @@
 
 const int MAGIC_LEN = 32;
 const char MAGIC_CODE_STD[MAGIC_LEN] = "THIS IS A TEST VER";
-const int META_BLOCK_IDX = 8 * 1024 / 256;//存放在第8MB的地方
+const int META_BLOCK_IDX = 1;//Store it as 256KB (it seems the value is a multiple of 256KB) - TODO: remove saving
 const int SRAM_NOT_SAVE_BACKUP_BLOCK_IDX = META_BLOCK_IDX + 1;
 //如果一开始没选save sram,可能导致sram炸了，因此这个时候要把sram保存到这个位置
 void loadFlashSaveToBuffer(int GameMBOffset,bool loadFromAutoSave);
