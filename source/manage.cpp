@@ -10,7 +10,7 @@
 
 const int MAGIC_LEN = 32;
 const char MAGIC_CODE_STD[MAGIC_LEN] = "THIS IS A TEST VER";
-const int META_BLOCK_IDX = 1;//Store it at 256KB (it seems the value is a multiple of 256KB) - TODO: remove saving
+const int META_BLOCK_IDX = 1;//Store it at 256KB (it seems the value is a multiple of 256KB)
 struct LastTimeRun{
     char MAGIC_CODE1[MAGIC_LEN];
     char gameName[GAME_NAME_LEN + 1];
