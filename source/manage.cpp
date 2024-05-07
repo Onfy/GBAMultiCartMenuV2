@@ -10,11 +10,7 @@
 
 const int MAGIC_LEN = 32;
 const char MAGIC_CODE_STD[MAGIC_LEN] = "THIS IS A TEST VER";
-const int META_BLOCK_IDX = 1;//Store it as 256KB (it seems the value is a multiple of 256KB) - TODO: remove saving
-const int SRAM_NOT_SAVE_BACKUP_BLOCK_IDX = META_BLOCK_IDX + 1;
-//如果一开始没选save sram,可能导致sram炸了，因此这个时候要把sram保存到这个位置
-void loadFlashSaveToBuffer(int GameMBOffset,bool loadFromAutoSave);
-void saveSramSaveToBuffer();
+const int META_BLOCK_IDX = 1;//Store it at 256KB (it seems the value is a multiple of 256KB) - TODO: remove saving
 struct LastTimeRun{
     char MAGIC_CODE1[MAGIC_LEN];
     char gameName[GAME_NAME_LEN + 1];
@@ -73,7 +69,6 @@ int askMBOffset(int lastOffset){
 
     saveMetaToFlash(newLastRun);
 
-    loadFlashSaveToBuffer(offset,false);//加载先前的存档
     gotoChipOffset(offset,true,false);//开始游戏
     return offset;
 }
@@ -82,13 +77,6 @@ bool autoStartGame(){
     gotoChipOffset(0,false,false);
     LastTimeRun last_run = *(volatile LastTimeRun*)(GAME_ROM + META_BLOCK_IDX * BLOCK_SIZE); 
     if(last_run.isValid()){
-        if(last_run.load_from_auto_save){//如果上次游戏进过菜单，sram可能会损坏，需要从autosave中load出来
-            printf("Loading auto save...");//等待时间会比较久，让玩家知道这是正常的
-            last_run.load_from_auto_save = false;
-            saveMetaToFlash(last_run);
-            loadFlashSaveToBuffer(0,true);
-            gotoChipOffset(last_run.MBOffset,true,false);//这次我们不用sram save lite中的数据恢复
-        }
         gotoChipOffset(last_run.MBOffset,true,true);
         return true;//should never return
     }
@@ -105,47 +93,6 @@ bool pressedKeyOnBoot(u16 key){
     }
     return false;
 }
-void saveSramToFlash(int GameMBOffset,bool isAutoSave){
-    int gameIdx = GameMBOffset / 8;
-    int blockIdx = (8 * 1024/256) + gameIdx;//从8MB的地方开始放，最多支持32个游戏，32*256KB=8MB，刚好用前16MB空间
-    if(isAutoSave){
-        blockIdx = SRAM_NOT_SAVE_BACKUP_BLOCK_IDX;//没选保存的情况下，就烧到这个地方。
-    }
-    saveSramSaveToBuffer();
-    unlockBlock(blockIdx);
-    eraseBlock(blockIdx);
-    flashIntelBuffered(blockIdx,0,64);
-    int flashAddr = blockIdx * BLOCK_SIZE;
-    vu8* flash = (vu8*)(GAME_ROM + flashAddr);
-    for(int i=0;i< 64 * 1024;i++){
-        if(flash[i] != globle_buffer[i]){
-            printf("sram save error at %d\n",i);
-            printf("flash=%x buffer=%x\n",flash[i],globle_buffer[i]);
-        }
-    }
-}
-void saveSramSaveToBuffer(){
-    vu8* sram = (vu8*)SRAM;
-    for(int i=0;i<64 * 1024;i++){
-        globle_buffer[i] = sram[i];
-    }
-	globle_buffer[2] = sramBackup[0];
-	globle_buffer[3] = sramBackup[1];
-	globle_buffer[4] = sramBackup[2];
-}
-void loadFlashSaveToBuffer(int GameMBOffset,bool loadFromAutoSave){
-    int gameIdx = GameMBOffset / 8;
-    int blockIdx = (8 * 1024/256) + gameIdx;//从8MB的地方开始放，最多支持32个游戏，32*256KB=8MB，刚好用前16MB空间
-    if(loadFromAutoSave){
-        blockIdx = SRAM_NOT_SAVE_BACKUP_BLOCK_IDX;
-    }
-    gotoChipOffset(0,false);//回到0 Offset的位置，保证读取到的是正确的东西
-    int flashAddr = blockIdx * BLOCK_SIZE;
-    vu8* flash = (vu8*)(GAME_ROM + flashAddr);
-    for(int i=0;i<64 * 1024;i++){
-        globle_buffer[i] = flash[i];
-    }
-}
 int trySaveGame(){
 
     LastTimeRun last_run = *(volatile LastTimeRun*)(GAME_ROM + META_BLOCK_IDX * BLOCK_SIZE); 
@@ -153,22 +100,6 @@ int trySaveGame(){
         std::string gameInfoStr = "Last Game:\nName: ";
         gameInfoStr += (const char*)last_run.gameName;
         gameInfoStr += "\nOffset: " +std::to_string(last_run.MBOffset)+std::string("MB");
-        std::string menuTitle = "Do you want to save last game?\n" + gameInfoStr;
-        
-        Menu menu(menuTitle.c_str());
-        menu.addOption("Yes");
-        menu.addOption("No");
-        int option = menu.getDecision();
-        if(option == 0){
-            saveSramToFlash(last_run.MBOffset,false);
-            printf("Sram saved\n");
-        }else{
-            printf("Save skipped\n");
-            printf("Working,please wait...\n");
-            saveSramToFlash(last_run.MBOffset,true);
-            last_run.load_from_auto_save = true;
-            saveMetaToFlash(last_run);
-        }
         // pressToContinue(true);
         pressToContinue(true);
         return last_run.MBOffset;
