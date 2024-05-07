@@ -70,7 +70,7 @@ IWRAM_CODE void findGames(){
     gameCnt = 0;
     unsigned int i;
     u16 MB_Offset;
-    for(MB_Offset = 16 ;MB_Offset < 256; MB_Offset += 8){\
+    for(MB_Offset = 8 ;MB_Offset < 256; MB_Offset += 4){\
         gotoChipOffset(MB_Offset,0);
         if(isGame()){
             vu8 *romName = (unsigned char*)0x80000A0;
