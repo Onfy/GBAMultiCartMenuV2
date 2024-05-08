@@ -10,7 +10,7 @@
 
 const int MAGIC_LEN = 32;
 const char MAGIC_CODE_STD[MAGIC_LEN] = "THIS IS A TEST VER";
-const int META_BLOCK_IDX = 1;//Store it at 256KB (it seems the value is a multiple of 256KB)
+const int META_BLOCK_IDX = 1;//Store metadata at 256KB (it seems the value is a multiple of 256KB)
 struct LastTimeRun{
     char MAGIC_CODE1[MAGIC_LEN];
     char gameName[GAME_NAME_LEN + 1];
@@ -101,7 +101,15 @@ int trySaveGame(){
         gameInfoStr += (const char*)last_run.gameName;
         gameInfoStr += "\nOffset: " +std::to_string(last_run.MBOffset)+std::string("MB");
         // pressToContinue(true);
-        pressToContinue(true);
+        std::string menuTitle = "Press A to continue\n" + gameInfoStr;
+        Menu menu(menuTitle.c_str());
+        menu.addOption("Ok");
+        int option = menu.getDecision();
+//        if(option == 0){
+//            pressToContinue(true);
+//        }
+//fix this better...
+        //Silly hack to prevent the screen instantly clearing by holding the shoulder button. Sorry.
         return last_run.MBOffset;
     }
     return -1;
