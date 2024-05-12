@@ -101,14 +101,13 @@ int trySaveGame(){
         gameInfoStr += (const char*)last_run.gameName;
         gameInfoStr += "\nOffset: " +std::to_string(last_run.MBOffset)+std::string("MB");
         // pressToContinue(true);
-        std::string menuTitle = "Press A to continue\n" + gameInfoStr;
+        std::string menuTitle = "\n" + gameInfoStr + "\n\nPress A to continue\n";
         Menu menu(menuTitle.c_str());
         menu.addOption("Ok");
         int option = menu.getDecision();
-//        if(option == 0){
-//            pressToContinue(true);
-//        }
-//fix this better...
+        if(option == 0){
+            printf("\n");
+        }
         //Silly hack to prevent the screen instantly clearing by holding the shoulder button. Sorry.
         return last_run.MBOffset;
     }
