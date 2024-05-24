@@ -1,6 +1,8 @@
 #include <gba_base.h>
 #include "misc.h"
 #include "flash.h"
+#include <cstring>
+//I hope this include doesn't bite me
 
 EWRAM_BSS u8 globle_buffer[BUFFER_SIZE];//64KB
 EWRAM_BSS u8 sramBackup[3];
@@ -77,9 +79,11 @@ IWRAM_CODE void findGames(){
             for(i=0;i<GAME_NAME_LEN;i++){
                 gameEntries[gameCnt].name[i] = romName[i];
             }
+            if (strcmp(gameEntries[gameCnt].name, "DR MARIO") != 0) { //exclude Dr. Mario multiboot from Puzzle League and DM
             gameEntries[gameCnt].name[GAME_NAME_LEN] = 0;//字符串结尾
             gameEntries[gameCnt].MB_offset = MB_Offset;
             gameCnt++;
+            }
         }
     }
     gotoChipOffset(0,0);//返回menu
