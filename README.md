@@ -1,16 +1,8 @@
-# GBAMultiCartMenuV2
+# GBAMultiCartMenuV2-batteryless
 
-Note: This fork is intended to modify the program's functionality. It's in progress, currently it shouldn't be considered stable. Data loss on your cartridge could occur.
+This is a fork of ArcheyChen's GBAMultiCartMenuV2, intended to modify the program to be better suited toward batteryless carts. It seems stable, I've tested it on my cart and I haven't noticed any problems, but maybe I messed up and it'll mess up your roms or saves. Be sure to make backups.
 
-Well, somebody want me to add readme, so here it is.
-
-What cart can you use?
-
-This is my cart's photo, I only tested on this cart, and it works for me.
-
-Someone said that "Zelda 7 in 1" semi works, that is: you can use the menu and can boot the game, but it can't remenber the last game and do autoboot etc.
-
-https://gitlab.com/Fexean/gbabf/uploads/113f48d8cfef92f30083cc8a7d92bddf/IMG20220611204247.jpg
+Rest of the readme that follows hasn't been changed yet.
 
 ## How to use?
 
